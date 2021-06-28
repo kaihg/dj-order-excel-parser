@@ -1,0 +1,5 @@
+轉檔資料.json
+.cache/*
+.vscode/*
+src/__pycache__/*
+__pycache__*
