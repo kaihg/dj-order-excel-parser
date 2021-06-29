@@ -23,7 +23,7 @@ jobs:
         name: install the package to create .exe
 
       - name: Build exe
-        run: pyinstaller -F main.py
+        run: pyinstaller -F ./src/main.py
 
       - name: Create Release
         id: create_release
