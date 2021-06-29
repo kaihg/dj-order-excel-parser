@@ -141,7 +141,11 @@ def ask_file_name(name: str):
 
 
 if __name__ == "__main__":
-    fn = ask_file_name(file_name)
-    shop_info = parse_excel(fn)
-    save_shop_info(shop_info)
-    input('轉檔完成')
+    try:
+        fn = ask_file_name(file_name)
+        shop_info = parse_excel(fn)
+        save_shop_info(shop_info)
+        input('轉檔完成')
+    except Exception as e:
+        input(e) 
+        pass
