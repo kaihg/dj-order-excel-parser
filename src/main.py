@@ -1,5 +1,7 @@
 import openpyxl
 import json
+from os import path
+from datetime import date
 
 file_name = '商家資料填寫表格.xlsx'
 
@@ -70,6 +72,23 @@ def parse_taste(sheet, item_idx_map):
     return taste_map
     pass
 
+def parse_shop(sheet):
+    name = sheet['B2'].value
+    phone = sheet['B4'].value
+    compony_id = sheet['B3'].value
+    address = sheet['B6'].value or sheet['B5'].value
+    sid = sheet['D2'].value
+
+    if sid is None or sid == "":
+        raise ValueError('無店家 ID')
+
+    return {
+        'name' : name,
+        'phone': phone,
+        'compony_id': compony_id,
+        'address': address,
+        'sid': sid
+    }
 
 def parse_excel(excel_name):
     excel = openpyxl.load_workbook(excel_name)
@@ -80,14 +99,20 @@ def parse_excel(excel_name):
     taste_sheet = excel['口味']
     tastes = parse_taste(taste_sheet, revere_index)
 
-    return {'kinds': food_items, 'taste': tastes}
+    shop_sheet = excel['商家資料表格']
+    shop_info = parse_shop(shop_sheet)
+
+    return {'kinds': food_items, 'taste': tastes, 'shop': shop_info}
 
     pass
 
 
 def save_shop_info(data):
     
-    with open('轉檔資料.json', 'w', encoding='utf8') as f:
+    name = data['shop']['name'] or 'noname'
+    sid = data['shop']['sid']
+
+    with open(f'{sid}_{name}_{date.today().isoformat()}.json', 'w', encoding='utf8') as f:
         json.dump(data, f, ensure_ascii=False)
 
     pass
@@ -107,6 +132,9 @@ def add_file_postfix(name):
 def ask_file_name(name: str):
     print('請輸入 excel 檔名，或是 enter 使用預設值:')
     user_input = input(f'({name}): ') or name
+
+    if not path.exists(user_input):
+        raise ValueError('尋無檔案')
 
     return add_file_postfix(user_input)
     pass
