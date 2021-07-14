@@ -90,6 +90,16 @@ def parse_shop(sheet):
         'sid': sid
     }
 
+def parse_shop_rows(sheet):
+    obj = {}
+
+    for row in sheet.iter_rows(min_row=2, min_col=2, max_col=3):
+        key = row[0].value
+        value = row[1].value
+        obj[key] = value
+        
+    return obj
+
 def parse_excel(excel_name):
     excel = openpyxl.load_workbook(excel_name)
 
@@ -100,12 +110,11 @@ def parse_excel(excel_name):
     tastes = parse_taste(taste_sheet, revere_index)
 
     shop_sheet = excel['商家資料表格']
-    shop_info = parse_shop(shop_sheet)
+    shop_info = parse_shop_rows(shop_sheet)
 
     return {'kinds': food_items, 'taste': tastes, 'shop': shop_info}
 
     pass
-
 
 def save_shop_info(data):
     
@@ -133,10 +142,12 @@ def ask_file_name(name: str):
     print('請輸入 excel 檔名，或是 enter 使用預設值:')
     user_input = input(f'({name}): ') or name
 
-    if not path.exists(user_input):
+    with_postfix = add_file_postfix(user_input)
+
+    if not path.exists(with_postfix):
         raise ValueError('尋無檔案')
 
-    return add_file_postfix(user_input)
+    return with_postfix
     pass
 
 
