@@ -18,6 +18,9 @@ def parse_food_items(sheet):
         kind = row[1].value
         price = row[2].value
         memo = row[3].value
+        if food_name is None or kind is None or price is None:
+            print(f'有資料空缺，此筆未寫入。{kind}, {food_name}, {price}')
+            continue
 
         # 產生 item_key，並初始化類別
         try:
@@ -32,7 +35,10 @@ def parse_food_items(sheet):
         # 存入map
         kind = item_map.get(str(kind_idx), {'kindname': kind})
         items = kind.get('items', {})
-        items[item_key] = {'foodname': food_name, 'price': price, 'memo': memo}
+        items[item_key] = {'foodname': food_name, 'price': price}
+        if memo:
+            items[item_key]['memo'] = memo
+
         kind['items'] = items
         item_map[str(kind_idx)] = kind
 
@@ -54,6 +60,10 @@ def parse_taste(sheet, item_idx_map):
         taste = row[0].value
         item_name = row[1].value
         price = row[2].value
+
+        if taste is None or item_name is None or price is None:
+            print(f'有資料空缺，此筆未寫入。{taste}, {item_name}, {price}')
+            continue
 
         if item_name in item_idx_map:
             # 取得 口味
@@ -95,8 +105,11 @@ def parse_shop_rows(sheet):
 
     for row in sheet.iter_rows(min_row=2, min_col=2, max_col=3):
         key = row[0].value
-        value = row[1].value
-        obj[key] = value
+        value = row[1].value or ""
+        if key is None:
+            print('店家資料不完整')
+        else:
+            obj[key] = value
         
     return obj
 
@@ -120,6 +133,7 @@ def save_shop_info(data):
     
     name = data['shop']['name'] or 'noname'
     sid = data['shop']['sid']
+    print(name,sid)
 
     with open(f'{sid}_{name}_{date.today().isoformat()}.json', 'w', encoding='utf8') as f:
         json.dump(data, f, ensure_ascii=False)
