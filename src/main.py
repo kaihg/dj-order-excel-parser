@@ -1,7 +1,8 @@
-import openpyxl
 import json
-from os import path
 from datetime import date
+from os import path
+
+import openpyxl
 
 file_name = '商家資料填寫表格.xlsx'
 
@@ -16,7 +17,7 @@ def parse_food_items(sheet):
     for row in sheet.iter_rows(min_row=2, max_col=4):
         food_name = row[0].value
         kind = row[1].value
-        price = row[2].value
+        price = int(row[2].value)
         memo = row[3].value
         if food_name is None or kind is None or price is None:
             print(f'有資料空缺，此筆未寫入。{kind}, {food_name}, {price}')
@@ -82,6 +83,7 @@ def parse_taste(sheet, item_idx_map):
     return taste_map
     pass
 
+
 def parse_shop(sheet):
     name = sheet['B2'].value
     phone = sheet['B4'].value
@@ -93,12 +95,13 @@ def parse_shop(sheet):
         raise ValueError('無店家 ID')
 
     return {
-        'name' : name,
+        'name': name,
         'phone': phone,
         'compony_id': compony_id,
         'address': address,
         'sid': sid
     }
+
 
 def parse_shop_rows(sheet):
     obj = {}
@@ -110,8 +113,9 @@ def parse_shop_rows(sheet):
             print('店家資料不完整')
         else:
             obj[key] = value
-        
+
     return obj
+
 
 def parse_excel(excel_name):
     excel = openpyxl.load_workbook(excel_name)
@@ -129,11 +133,11 @@ def parse_excel(excel_name):
 
     pass
 
+
 def save_shop_info(data):
-    
     name = data['shop']['name'] or 'noname'
     sid = data['shop']['sid']
-    print(name,sid)
+    print(name, sid)
 
     with open(f'{sid}_{name}_{date.today().isoformat()}.json', 'w', encoding='utf8') as f:
         json.dump(data, f, ensure_ascii=False)
@@ -172,5 +176,5 @@ if __name__ == "__main__":
         save_shop_info(shop_info)
         input('轉檔完成')
     except Exception as e:
-        input(e) 
+        input(e)
         pass
